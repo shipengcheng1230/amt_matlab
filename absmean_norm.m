@@ -2,13 +2,13 @@ function [ data ] = absmean_norm( npts, data, halfwinlen )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-loop = 2;
+loop = 3;
 trun_times = 10;
 winlen = 2 * halfwinlen + 1;
 rms_d = rms(data);
 
 while loop    
-    trun_bool = bsxfun(@gt, data, rms_d);
+    trun_bool = bsxfun(@gt, data, 2 * rms_d);
     trun_bool = ... 
         trun_bool + ...
         (trun_bool == 0) .* 1 + ...
