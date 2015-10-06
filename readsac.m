@@ -197,6 +197,7 @@ function [t1, t2, d] = readsac(filenames)
 %
 
 % process input argument
+
 if nargin < 1
     filenames = dir;
     filenames = filenames(~[filenames.isdir]);
