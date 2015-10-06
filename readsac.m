@@ -251,9 +251,9 @@ for f = 1:nfiles
 
     if fid ~= -1
         % read SAC file header
-        [A count1] = fread(fid, [70 1], 'float32');
+        [A, count1] = fread(fid, [70 1], 'float32');
         if count1 ~= 70, continue; end
-        [B count2] = fread(fid, [40 1], 'int32');
+        [B, count2] = fread(fid, [40 1], 'int32');
         if count2 ~= 40, continue; end
         if ~ismember(B(7), 1:6) % non-native byte order
             fclose(fid);
@@ -266,7 +266,7 @@ for f = 1:nfiles
             A = fread(fid, [70 1], 'float32');
             B = fread(fid, [40 1], 'int32');
         end
-        [C count3] = fread(fid, [1 192], 'char');
+        [C, count3] = fread(fid, [1 192], 'char');
         if count3 ~= 192, continue; end
         C = char(C);
 
