@@ -8,22 +8,24 @@ outpre = [prestack_dir, 'outpre.temp'];
 
 outpreID = fopen(outpre, 'r');
 stacksize = fscanf(outpreID, '%d\n');
+num_sta = stacksize(1);
+num_seg = stacksize(2);
 stackname = textscan(outpreID, '%s\n');
 stackname = stackname{1, 1};
 fclose(outpreID);
 
-xcorr_winlen = repmat({1800}, stacksize(2), 1);
-xcorr_overlap = repmat({0.75}, stacksize(2), 1);
-xcorr_wintype = repmat({'hann'}, stacksize(2), 1);
+xcorr_winlen = repmat({1800}, num_seg, 1);
+xcorr_overlap = repmat({0.75}, num_seg, 1);
+xcorr_wintype = repmat({'hann'}, num_seg, 1);
 
 addpre = @(name) [prestack_dir, name];
 stackname = cellfun(addpre, stackname, 'UniformOutput', false);
-stackname = reshape(stackname, stacksize(2), stacksize(1));
+stackname = reshape(stackname, num_seg, num_sta);
 
-for ii = 1: stacksize(1) - 1
+for ii = 1: num_sta - 1
     name1 = stackname(:, ii);
     S1 = cellfun(@readsac, name1, 'UniformOutput', false);
-    parfor jj = ii + 1: stacksize(1)        
+    for jj = ii + 1: num_sta   
         name2 = stackname(:, jj);        
         S2 = cellfun(@readsac, name2, 'UniformOutput', false);
         corrdate = cellfun(@xcorr_welch, ...
@@ -31,7 +33,7 @@ for ii = 1: stacksize(1) - 1
             'UniformOutput', false);
         corrdate = cell2mat(corrdate);
         corrdate = reshape(...
-            corrdate, floor(numel(corrdate)/stacksize(2)), stacksize(2));
+            corrdate, floor(numel(corrdate)/num_seg), num_seg);
         corrdate = sum(corrdate, 2);
         
         snew = S1{1, 1};

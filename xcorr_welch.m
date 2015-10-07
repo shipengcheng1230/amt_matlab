@@ -3,9 +3,9 @@ function [ cor_data ] = xcorr_welch( ...
 %XCORR_WELCH Summary of this function goes here
 %   Detailed explanation goes here
 
-if S1.DELTA ~= S2.DELTA || S1.NPTS ~= S2.NPTS
-    error('COR DATA DOES NOT MATCH!')
-end
+% if S1.DELTA ~= S2.DELTA || S1.NPTS ~= S2.NPTS
+%     error('COR DATA DOES NOT MATCH!')
+% end
 
 pstride = floor(winlen / S1.DELTA * (1 - overlap));
 winpoint = floor(winlen / S1.DELTA);
