@@ -3,6 +3,7 @@ function [ data ] = spectral_norm( data )
 %   Detailed explanation goes here
 
 lpc_order = 8;
+
 cof_lpc = lpc(data, lpc_order);
 data = filter(cof_lpc, 1, data);
 

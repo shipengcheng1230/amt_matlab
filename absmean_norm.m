@@ -8,7 +8,7 @@ winlen = 2 * halfwinlen + 1;
 rms_d = rms(data);
 
 while loop    
-    trun_bool = bsxfun(@gt, data, 2 * rms_d);
+    trun_bool = bsxfun(@gt, data, 1.5 * rms_d);
     trun_bool = ... 
         trun_bool + ...
         (trun_bool == 0) .* 1 + ...
@@ -23,7 +23,7 @@ while loop
         weight(ii) = ... 
             sum(abs(data(ii - halfwinlen: ii + halfwinlen))) / winlen;
     end
-  
+    
     data = data ./ weight;
     rms_d_new = rms(data);
     

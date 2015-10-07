@@ -1,5 +1,5 @@
 %preconditions for raw ambient noise data
-clc;
+clear;
 distcomp.feature( 'LocalUseMpiexec', false );
 
 raw_dir = './seis_data/raw_data/';
@@ -8,22 +8,22 @@ outpre = [prestack_dir, 'outpre.temp'];
 
 sta_file = dir([raw_dir, '*.SAC']);
 num_file = length(sta_file);
+nsta = num_file;
 
 seg_seconds = 86400;
 freq_low = 0.01;
 freq_high = 0.333;
 filter_order = 4;
-xcorr_winlen = 1800;
-xcorr_overlap = 0.75;
 
 winlen = floor(0.5 / freq_low);
 halfwinlen = floor((winlen - 1) / 2);
 
-for ii = 1: num_file
+parfor ii = 1: num_file
     S = readsac([raw_dir, sta_file(ii).name]);
     [t, d] = getsacdata(S);
     
     if check_zero(S.NPTS, d) == 1
+        nsta = nsta - 1;
         continue
     end
     
@@ -39,6 +39,7 @@ for ii = 1: num_file
     S.E = seg_seconds;
     if ii == 1
         outpreID = fopen(outpre, 'w');
+        fprintf(outpreID, '%d\n%d\n', nsta, seg);
     else
         outpreID = fopen(outpre, 'a');
     end
@@ -47,7 +48,7 @@ for ii = 1: num_file
         S.DATA1 = d((jj - 1) * S.NPTS + 1: jj * S.NPTS);
         name = ...
             [S.KNETWK, '_', S.KSTNM, '_', S.KCMPNM, '_', ...
-            num2str(jj), '.SAC'];        
+            num2str(jj), '.SAC'];
         S.FILENAME = ...
             [prestack_dir, name];
         fprintf(outpreID, '%s\n', name);
