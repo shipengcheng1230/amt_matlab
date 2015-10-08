@@ -2,6 +2,7 @@
 clear;
 distcomp.feature( 'LocalUseMpiexec', false );
 
+tic
 prestack_dir = './seis_data/pre_stack/';
 poststack_dir = './seis_data/post_stack/';
 outpre = [prestack_dir, 'outpre.temp'];
@@ -21,7 +22,7 @@ xcorr_wintype = repmat({'hann'}, num_seg, 1);
 addpre = @(name) [prestack_dir, name];
 stackname = cellfun(addpre, stackname, 'UniformOutput', false);
 stackname = reshape(stackname, num_seg, num_sta);
-tic
+
 for ii = 1: num_sta - 1
     name1 = stackname(:, ii);
     name1_msg = name1{1};

@@ -2,6 +2,7 @@
 clear;
 distcomp.feature( 'LocalUseMpiexec', false );
 
+tic
 raw_dir = './seis_data/raw_data/';
 prestack_dir = './seis_data/pre_stack/';
 discard_dir = './seis_data/discard_data/';
@@ -92,3 +93,4 @@ parfor ii = 1: nsta
     end
     fclose(outpreID);
 end
+toc
