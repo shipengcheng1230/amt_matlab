@@ -25,12 +25,24 @@ stackname = reshape(stackname, num_seg, num_sta);
 for ii = 1: num_sta - 1
     name1 = stackname(:, ii);
     S1 = cellfun(@readsac, name1, 'UniformOutput', false);
-    for jj = ii + 1: num_sta   
-        name2 = stackname(:, jj);        
+    for jj = ii + 1: num_sta
+        name2 = stackname(:, jj);
         S2 = cellfun(@readsac, name2, 'UniformOutput', false);
-        corrdate = cellfun(@xcorr_welch, ...
-            S1, S2, xcorr_winlen, xcorr_overlap, xcorr_wintype, ...
-            'UniformOutput', false);
+        
+        try
+            corrdate = cellfun(@xcorr_welch, ...
+                S1, S2, xcorr_winlen, xcorr_overlap, xcorr_wintype, ...
+                'UniformOutput', false);
+        catch ME
+            if (strcmp(ME.identifier, 'dataMismatch:SampletimeMismatch'))
+                msg = 'Check data sample rate';
+                causeException = ...
+                    MException('dataMismatch:SampletimeMismatch', msg);
+                ME = addCause(ME, causeException);
+            end
+            rethrow(ME)
+        end
+        
         corrdate = cell2mat(corrdate);
         corrdate = reshape(...
             corrdate, floor(numel(corrdate)/num_seg), num_seg);
