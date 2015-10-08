@@ -16,6 +16,8 @@ seg_seconds = 86400;
 freq_low = 0.01;
 freq_high = 0.333;
 filter_order = 4;
+freq_low_absm = 0.0166;
+freq_high_absm = 0.2000;
 
 winlen = floor(0.5 / freq_low);
 halfwinlen = floor((winlen - 1) / 2);
@@ -28,14 +30,33 @@ for ii = 1: num_file
         nsta = nsta - 1;
         movefile(dfname, [discard_dir, S.FILENAME]);
         continue
-    end       
+    end
+    
+    if freq_high >= 0.5 / S.DELTA
+        ME = MException(...
+            'arguSetting:exceedingNyquist', ...
+            'Corner freq. %f greater than Nyquist %f!', ...
+            freq_high, 0.5 / S.DELTA);
+        throw(ME)
+    end
     
     [b, a] = butter(filter_order, [freq_low, freq_high] .* S.DELTA .* 2);
     d = filter(b, a, d);
     
-%     d = absmean_norm(S.NPTS, d, halfwinlen);
-%     
-%     d = spectral_norm(d);
+    try
+        d = absmean_norm(S.NPTS, d, halfwinlen, S.DELTA,...
+            freq_low_absm, freq_high_absm, filter_order);
+    catch ME
+        if (strcmp(ME.identifier, 'arguSetting:exceedingNyquist'))
+            msg = 'RESET ''freq_high_absm''';
+            causeException = ...
+                MException('arguSetting:exceedingNyquist', msg);
+            ME = addCause(ME, causeException);
+        end
+        rethrow(ME)
+    end
+    
+    d = spectral_norm(d);
     
     seg = floor(S.NPTS * S.DELTA / seg_seconds);
     segn = min(seg, segn);
@@ -57,7 +78,7 @@ for ii = 1: nsta
     Snew.NPTS = floor(seg_seconds / S.DELTA);
     Snew.E = seg_seconds;
     
-    outpreID = fopen(outpre, 'a');    
+    outpreID = fopen(outpre, 'a');
     for jj = 1: segn
         Snew.DATA1 = S.DATA1((jj - 1) * Snew.NPTS + 1: jj * Snew.NPTS);
         name = ...
