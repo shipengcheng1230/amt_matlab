@@ -21,11 +21,12 @@ xcorr_wintype = repmat({'hann'}, num_seg, 1);
 addpre = @(name) [prestack_dir, name];
 stackname = cellfun(addpre, stackname, 'UniformOutput', false);
 stackname = reshape(stackname, num_seg, num_sta);
-
+tic
 for ii = 1: num_sta - 1
     name1 = stackname(:, ii);
+    name1_msg = name1{1};
     S1 = cellfun(@readsac, name1, 'UniformOutput', false);
-    for jj = ii + 1: num_sta
+    parfor jj = ii + 1: num_sta        
         name2 = stackname(:, jj);
         S2 = cellfun(@readsac, name2, 'UniformOutput', false);
         
@@ -35,12 +36,14 @@ for ii = 1: num_sta - 1
                 'UniformOutput', false);
         catch ME
             if (strcmp(ME.identifier, 'dataMismatch:SampletimeMismatch'))
-                msg = 'Check data sample rate';
+                msg = sprintf('Check data sample rate:\n%s\n%s\n', ...
+                    name1_msg, name2{1});
                 causeException = ...
                     MException('dataMismatch:SampletimeMismatch', msg);
                 ME = addCause(ME, causeException);
+                disp(ME.cause{1}.message)
             end
-            rethrow(ME)
+            continue
         end
         
         corrdate = cell2mat(corrdate);
@@ -65,3 +68,4 @@ for ii = 1: num_sta - 1
         writesac(snew);
     end
 end
+toc

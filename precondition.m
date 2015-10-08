@@ -22,7 +22,7 @@ freq_high_absm = 0.2000;
 winlen = floor(0.5 / freq_low);
 halfwinlen = floor((winlen - 1) / 2);
 
-for ii = 1: num_file
+parfor ii = 1: num_file
     dfname = [raw_dir, sta_file(ii).name];
     S = readsac(dfname);
     [t, d] = getsacdata(S);
@@ -65,13 +65,14 @@ for ii = 1: num_file
     S.DATA1 = d;
     writesac(S);
 end
+close(hh)
 
 sta_file = dir([raw_dir, '*.SAC']);
 outpreID = fopen(outpre, 'w');
 fprintf(outpreID, '%d\n%d\n', nsta, segn);
 fclose(outpreID);
 
-for ii = 1: nsta
+parfor ii = 1: nsta
     dfname = [raw_dir, sta_file(ii).name];
     S = readsac(dfname);
     Snew = S;
