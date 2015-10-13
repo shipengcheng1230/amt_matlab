@@ -76,7 +76,7 @@ for ii = 1: num_file
         rethrow(ME)
     end
     
-    d = spectral_norm(d, S.NPTS, S.DELTA);
+     d = spectral_norm(d, S.NPTS, S.DELTA);
     
     seg = floor(S.NPTS * S.DELTA / seg_seconds);
     

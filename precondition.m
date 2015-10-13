@@ -9,13 +9,13 @@ discard_dir = './seis_data/discard_data/';
 outpre = [prestack_dir, 'outpre.temp'];
 
 sta_file = dir([raw_dir, '*.SAC']);
-num_file = length(sta_file);
+num_file = length(sta_file); 
 nsta = num_file;
 segn = Inf;
 
 seg_seconds = 86400;
-freq_low = 0.01;
-freq_high = 0.333;
+freq_low = 0.5;
+freq_high = 5;
 filter_order = 4;
 freq_low_absm = 0.0166;
 freq_high_absm = 0.2000;
@@ -66,7 +66,6 @@ parfor ii = 1: num_file
     S.DATA1 = d;
     writesac(S);
 end
-close(hh)
 
 sta_file = dir([raw_dir, '*.SAC']);
 outpreID = fopen(outpre, 'w');
