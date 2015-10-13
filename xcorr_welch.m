@@ -3,7 +3,7 @@ function [ cor_data ] = xcorr_welch( ...
 %XCORR_WELCH Summary of this function goes here
 %   Detailed explanation goes here
 
-if S1.DELTA ~= S2.DELTA
+if abs(S1.DELTA - S2.DELTA) > 1e-9
     ME = MException(...
         'dataMismatch:SampletimeMismatch', ...
         'sample time:\n %f\n %f\n', ...
@@ -34,4 +34,3 @@ for ii = 1: pstride: S1.NPTS
 end
 
 end
-

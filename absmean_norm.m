@@ -1,12 +1,10 @@
-function [ data ] = absmean_norm( npts, data, halfwinlen, ...
-    delta, freqlow, freqhigh, filter_order )
+function [ data ] = absmean_norm( data, npts, delta, ...
+     winlen, freqlow, freqhigh, filter_order )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-loop = 3;
-trun_times = 10;
-winlen = 2 * halfwinlen + 1;
-rms_d = rms(data);
+iter = 5;
+water_level = 6;
 
 if freqhigh >= 0.5 / delta
     ME = MException(...
@@ -18,30 +16,24 @@ end
 
 [b, a] = butter(filter_order, [freqlow, freqhigh] .* delta .* 2);
 
-while loop
-    trun_bool = bsxfun(@gt, data, 1.5 * rms_d);
-    trun_bool = ...
-        trun_bool + ...
+while iter
+    dtemp = filter(b, a, data);
+    weight = smooth(abs(dtemp), winlen);
+    data = data ./ weight;
+    data(isnan(data)) = 0;
+    
+    trun_bool = abs(data) > (water_level * rms(data));
+    trun_times = max(abs(data));
+    trun_bool = trun_bool + ...
         (trun_bool == 0) .* 1 + ...
         (trun_bool == 1) .* (1 / trun_times - 1);
-    data = bsxfun(@times, data, trun_bool);
+    data = data .* trun_bool;
     
-    lbd = halfwinlen + 1;
-    rbd = npts - halfwinlen;
-    weight = ones(npts, 1);
-    
-    dtemp = filter(b, a, data);
-    
-    for ii = lbd: rbd
-        weight(ii) = ...
-            sum(abs(dtemp(ii - halfwinlen: ii + halfwinlen))) / winlen;
+    if sum(abs(data) > (water_level * rms(data))) < 0.001 * npts
+        break
+    else
+        iter = iter - 1;
     end
-    
-    data = data ./ weight;
-    rms_d_new = rms(data);
-    
-    loop = loop - (rms_d_new > rms_d);
-    rms_d = rms_d_new;
 end
 
 end
