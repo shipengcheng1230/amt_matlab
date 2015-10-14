@@ -40,7 +40,7 @@ Y = Y / max(P);
 P = abs(Y);
 
 sect_data = P(k_lb: k_rb) .* tukeywin(num_k, taper_percentile);
-envo_data = envelope(sect_data, round(num_k / 10), 'peak');
+envo_data = envelope(sect_data, round(num_k / 5), 'peak');
 Y(k_lb: k_rb) = Y(k_lb: k_rb) ./ envo_data;
 Y(k2_rb: k2_lb) = Y(k2_rb: k2_lb) ./ flip(envo_data);
 
