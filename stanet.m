@@ -2,7 +2,9 @@ function [ status ] = stanet( net_dir, prestack_dir, discard_dir )
 %STANET Summary of this function goes here
 %   Detailed explanation goes here
 stanet= dir(net_dir);
-comexpr_sac = '\w*(SAC)\w*';
+regexpr_sac = '\w*(SAC)\w*';
+regexpr_centre = '[\w-]*[0-9]+(m)';
+regexpr_dist = '[0-9]+m';
 precondtemp = 'precond.temp';
 
 for ii = 3: length(stanet)
@@ -14,14 +16,14 @@ for ii = 3: length(stanet)
     if exist(prestacknet_dir, 'dir') ~= 7
         mkdir(prestacknet_dir)
     end
-    precondtemp = strcat(prestacknet_dir, precondtemp);
+    precondtemp_name = strcat(prestacknet_dir, precondtemp);
     
     equip_dir = fullfile(net_dir, stanet(ii).name, filesep);
     equip = dir(equip_dir);
     equip_name = {equip([equip.isdir]==1).name};
     equip_name = equip_name(3: end);
     
-    comexpr_centre = [stanet(ii).name, '\w*[0-9]+(m)'];
+    comexpr_centre = [stanet(ii).name, regexpr_centre];
     equip_prepheral = regexp(equip_name, comexpr_centre, 'match');
     equip_prepheral = cell2mat ...
         (cellfun(@isempty, equip_prepheral, 'UniformOutput', false));
@@ -31,7 +33,7 @@ for ii = 3: length(stanet)
     data_centre_dir = fullfile(equip_dir, char(equip_centre), filesep);
     data_centre = dir(data_centre_dir);
     data_centre_dir_next = ...
-        regexpi({data_centre(:).name}, comexpr_sac, 'match');
+        regexpi({data_centre(:).name}, regexpr_sac, 'match');
     data_centre_dir_next = data_centre_dir_next(cell2mat(cellfun(...
         @isempty, data_centre_dir_next, ...
         'UniformOutput', false)) == 0);
@@ -41,11 +43,11 @@ for ii = 3: length(stanet)
     num_prepheral = numel(equip_prepheral);
     radius = zeros(num_prepheral, 1);
     
-    tempID = fopen(precondtemp, 'w');
+    tempID = fopen(precondtemp_name, 'w');
     fprintf(tempID, '%s\n', data_centre_dir);
     
     for jj = 1: num_prepheral
-        dist = regexp(equip_prepheral(jj), '[0-9]+m', 'match');
+        dist = regexp(equip_prepheral(jj), regexpr_dist, 'match');
         dist = char(dist{:});
         radius(jj) = str2double(dist(1: end - 1));
         equip_rad_dir = ...
@@ -60,7 +62,7 @@ for ii = 3: length(stanet)
                 fullfile(equip_rad_dir, char(equip_seq(kk)), filesep);
             data_centre = dir(equip_seq_dir);
             equip_seq_dir_next = ...
-                regexpi({data_centre(:).name}, comexpr_sac, 'match');
+                regexpi({data_centre(:).name}, regexpr_sac, 'match');
             equip_seq_dir_next = equip_seq_dir_next(cell2mat(cellfun(...
                 @isempty, equip_seq_dir_next, ...
                 'UniformOutput', false)) == 0);
@@ -68,7 +70,7 @@ for ii = 3: length(stanet)
                 equip_seq_dir, char(equip_seq_dir_next{:}), filesep);
             fprintf(tempID, '%s\n', equip_seq_dir);
         end
-    end
+    end       
     fclose(tempID);
 end
 

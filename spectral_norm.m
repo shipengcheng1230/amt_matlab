@@ -2,7 +2,7 @@ function [ d_whiten ] = spectral_norm( data, npts, delta )
 %SPECTRAL_NORM Summary of this function goes here
 %   Detailed explanation goes here
 
-para_initial(2);
+para_initial(3);
 global FREQ_LOW_ABSM
 global FREQ_HIGH_ABSM
 global TAPER_PERCENTILE

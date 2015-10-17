@@ -1,4 +1,5 @@
-function [ status ] = precond( data_dir, discard_dir, component )
+function [ Snew ] = precond( ...
+    data_dir, discard_dir, component )
 %PRECOND Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,39 +10,35 @@ component = unique([lower(component), upper(component)]);
 comexpr = ['[\w.]*_[', component, '][\w.]*'];
 sta_file = regexp(sta_file, comexpr, 'match');
 num_file = length(sta_file);
-nsta = num_file;
+Snew = sacstruct(num_file);
 
 para_initial(1);
 global FREQ_LOW
 global FREQ_HIGH
 global FILTER_ORDER
-global FREQ_LOW_ABSM
-global FREQ_HIGH_ABSM
-global WINLEN_ABSM
-global SEG_SECONDS
 global TAPER_PERCENTILE
+global HAMPEL_WIN
 
 freq_low = FREQ_LOW;
 freq_high = FREQ_HIGH;
 filter_order = FILTER_ORDER;
-freq_low_absm = FREQ_LOW_ABSM;
-freq_high_absm = FREQ_HIGH_ABSM;
-winlen = WINLEN_ABSM;
-seg_seconds = SEG_SECONDS;
 taper_percentile = TAPER_PERCENTILE;
+hampel_win = HAMPEL_WIN;
 para_initial(0);
 
 for ii = 1: num_file
     dfname = strcat(data_dir, sta_file(ii));
     S = readsac(dfname);
     d = S.DATA1;
-    d = hampel(detrend(d), floor(0.001 * S.NPTS));
+    S.DATA1 = [];
+    d = hampel(detrend(d), floor(hampel_win / S.DELTA));
     wintaper = tukeywin(S.NPTS, taper_percentile);
     d = d .* wintaper;
     
     if check_zero(S)
         nsta = nsta - 1;
         movefile(dfname, [discard_dir, S.FILENAME]);
+        Snew(ii) = struct([]);
         continue
     end
     
@@ -64,8 +61,7 @@ for ii = 1: num_file
     end
     
     try
-        d = absmean_norm(d, S.NPTS, S.DELTA,...
-            winlen, freq_low_absm, freq_high_absm, filter_order);
+        d = absmean_norm(d, S.DELTA);
     catch ME
         if (strcmp(ME.identifier, 'arguSetting:exceedingNyquist'))
             msg = 'RESET ''freq_high_absm''';
@@ -79,13 +75,8 @@ for ii = 1: num_file
     d = spectral_norm(d, S.NPTS, S.DELTA);
     d = d / max(abs(d));
     
-    seg = floor(S.NPTS * S.DELTA / seg_seconds);
-    
-    S.FILENAME = ['a', char(dfname)];
-    S.DATA1 = d;
-    writesac(S);
+    Snew(ii) = S;
+    Snew(ii).DATA1 = d;
 end
 
-status(1) = nsta;
-status(2) = seg;
 end
