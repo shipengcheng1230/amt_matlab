@@ -10,7 +10,8 @@ regexpr_with_dash = '[\w-]*';
 precondtemp_name = 'precond.temp';
 stalist_name = 'stalist';
 
-for ii = 3: length(stanet)
+num_stanet = length(stanet);
+for ii = 3: num_stanet
     if stanet(ii).isdir == 0
         continue
     end
@@ -30,7 +31,7 @@ for ii = 3: length(stanet)
     [equip_centre_dir, ~] = ...
         foldfind(equip_dir, comexpr_prepheral, 'unmatch');
     [equip_centre_dir, ~] = ...
-        foldfind(char(equip_centre_dir), regexpr_sac, 'match');
+        foldfind(char(equip_centre_dir), regexpr_sac, 'match', false);
     
     S_centre = precond(char(equip_centre_dir), discard_dir, component);
     numseg = incision( ...
