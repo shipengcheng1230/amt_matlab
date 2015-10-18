@@ -14,10 +14,10 @@ end
 
 regexpr_num_dash = '[0-9-]*';
 
-para_initial(4)
+para_initial(4);
 global SEG_SECOND
 seg_second = SEG_SECOND;
-para_initial(0)
+para_initial(0);
 
 num_file = numel(S);
 
@@ -47,16 +47,24 @@ if num_oldfile > 0
     if exist(trash_dir, 'dir') ~= 7
         mkdir(trash_dir)
     end
-    prestacknet_dir = repmat({prestacknet_dir}, 1, num_oldfile);
     trash_dir = repmat({trash_dir}, 1, num_oldfile);
+    oldname = repmat({prestacknet_dir}, 1, num_oldfile);    
     oldfile = cellfun(@fullfile, ...
-        prestacknet_dir, {oldfile(3: end).name}, 'UniformOutput', false);
+        oldname, {oldfile(3: end).name}, 'UniformOutput', false);
     cellfun(@movefile, oldfile, trash_dir);
 end
 
 if isinf(seg_second)
-    S(:).FILENAME = fullfile(prestacknet_dir, S(:).FILENAME);
-    flag = arrayfun(@writesac, S);
+    writename = ...
+        cellfun( ...
+        @fullfile, ...
+        repmat({prestacknet_dir}, 1, num_file), ...
+        {S(:).FILENAME}, ...
+        'UniformOutput', false);
+    [S.FILENAME] = writename{:};
+    for ii = 1: num_file
+        writesac(S(ii));
+    end
 else
     num_seg = min(floor(S(:).NPTS .* S(:).DELTA ./ seg_second));
     for ii = 1: num_file
@@ -73,6 +81,6 @@ else
             writesac(Snew);
         end
     end
-    flag = 1;
 end
+flag = 0;
 end
