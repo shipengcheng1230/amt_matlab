@@ -27,21 +27,17 @@ xcorr_wintype = 'hann';
 
 try
     switch step
-        case 0
+        case 'clear'
             clear global
             status = 0;
-        case 1
+        case 'precond'
             eval(setGlobalstr('FREQ_LOW', freq_low));
             eval(setGlobalstr('FREQ_HIGH', freq_high));
             eval(setGlobalstr('FILTER_ORDER', filter_order));
-            eval(setGlobalstr('FREQ_LOW_ABSM', freq_low_absm));
-            eval(setGlobalstr('FREQ_HIGH_ABSM', freq_high_absm));
-            eval(setGlobalstr('WINLEN_ABSM', winlen_absm));
-            eval(setGlobalstr('SEG_SECONDS', seg_seconds));
             eval(setGlobalstr('TAPER_PERCENTILE', taper_percentile));
             eval(setGlobalstr('HAMPEL_WIN', hampel_win));
             status = 0;
-        case 2
+        case 'absmean'
             eval(setGlobalstr('FREQ_LOW_ABSM', freq_low_absm));
             eval(setGlobalstr('FREQ_HIGH_ABSM', freq_high_absm));
             eval(setGlobalstr('FILTER_ORDER', filter_order));
@@ -49,14 +45,14 @@ try
             eval(setGlobalstr('WATER_LEVEL', water_level));
             eval(setGlobalstr('HAMPEL_WIN', hampel_win));
             eval(setGlobalstr('MAX_ITER', max_iter));
-        case 3
+        case 'specnorm'
             eval(setGlobalstr('FREQ_LOW_ABSM', freq_low_absm));
             eval(setGlobalstr('FREQ_HIGH_ABSM', freq_high_absm));
             eval(setGlobalstr('TAPER_PERCENTILE', taper_percentile));
-        case 4
+        case 'incisise'
             eval(setGlobalstr('SEG_SECOND', seg_seconds));
             status = 0;
-        case 5
+        case 'xcorr'
             eval(setGlobalstr('XCORR_WINLEN', xcorr_winlen));
             eval(setGlobalstr('XCORR_OVERLAP', xcorr_overlap));
             eval(setGlobalstr('XCORR_WINTYPE', xcorr_wintype));

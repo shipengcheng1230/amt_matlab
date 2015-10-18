@@ -8,6 +8,7 @@ regexpr_peripheral = '[\w-]*[0-9]+(m)';
 regexpr_dist = '[0-9]+m';
 regexpr_with_dash = '[\w-]*';
 precondtemp = 'precond.temp';
+stalist_name = 'stalist';
 
 for ii = 3: length(stanet)
     if stanet(ii).isdir == 0
@@ -19,6 +20,10 @@ for ii = 3: length(stanet)
         mkdir(prestacknet_dir);
     end
     
+    stalist = fullfile(prestack_dir, stanet(ii).name, stalist_name);
+    stalistID = fopen(stalist, 'w');
+    fclose(stalistID);
+    
     equip_dir = fullfile(net_dir, stanet(ii).name, filesep);
     comexpr_prepheral = [stanet(ii).name, regexpr_peripheral];
     
@@ -29,7 +34,8 @@ for ii = 3: length(stanet)
     
     S_centre = precond(char(equip_centre_dir), discard_dir, component);
     incision( ...
-        S_centre, prestack_dir, discard_dir, stanet(ii).name, 'centre');
+        S_centre, prestack_dir, discard_dir, stanet(ii).name, ...
+        stalist, 'centre');
     
     [equip_peripheral_dir, equip_peripheral] = ...
         foldfind(equip_dir, comexpr_prepheral, 'match');
@@ -55,11 +61,11 @@ for ii = 3: length(stanet)
         for kk = 1: num_seq
             [sac_fold, ~] = ...
                 foldfind(equip_seq_dir{kk}, regexpr_sac, 'match', false);
-            S_peripheral = ... 
+            S_peripheral = ...
                 precond(char(sac_fold), discard_dir, component);
             incision( ...
-                S_peripheral, prestack_dir, discard_dir, ... 
-                stanet(ii).name, equip_seq(kk));            
+                S_peripheral, prestack_dir, discard_dir, ...
+                stanet(ii).name, stalist, equip_seq(kk));
         end
     end
     fclose(tempID);

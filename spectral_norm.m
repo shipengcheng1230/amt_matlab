@@ -2,7 +2,7 @@ function [ d_whiten ] = spectral_norm( data, npts, delta )
 %SPECTRAL_NORM Summary of this function goes here
 %   Detailed explanation goes here
 
-para_initial(3);
+para_initial('specnorm');
 global FREQ_LOW_ABSM
 global FREQ_HIGH_ABSM
 global TAPER_PERCENTILE
@@ -10,7 +10,7 @@ global TAPER_PERCENTILE
 freq_low = FREQ_LOW_ABSM;
 freq_high = FREQ_HIGH_ABSM;
 taper_percentile = TAPER_PERCENTILE;
-para_initial(0);
+para_initial('clear');
 
 npow2 = 2^nextpow2(npts);
 n_centre = npow2 / 2;

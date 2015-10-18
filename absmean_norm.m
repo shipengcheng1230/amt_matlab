@@ -2,7 +2,7 @@ function [ data ] = absmean_norm( data, delta )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-para_initial(2);
+para_initial('absmean');
 global FREQ_LOW_ABSM
 global FREQ_HIGH_ABSM
 global FILTER_ORDER
@@ -18,7 +18,7 @@ water_level = WATER_LEVEL;
 winlen = WINLEN_ABSM;
 hampel_win = HAMPEL_WIN;
 max_iter = MAX_ITER;
-para_initial(0);
+para_initial('clear');
 
 hampel_npts = floor(hampel_win / delta);
 

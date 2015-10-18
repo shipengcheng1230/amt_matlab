@@ -11,8 +11,9 @@ comexpr = ['[\w.]*_[', component, '][\w.]*'];
 sta_file = regexp(sta_file, comexpr, 'match');
 num_file = length(sta_file);
 Snew = sacstruct(num_file);
+keep = ones(num_file, 1);
 
-para_initial(1);
+para_initial('precond');
 global FREQ_LOW
 global FREQ_HIGH
 global FILTER_ORDER
@@ -24,7 +25,7 @@ freq_high = FREQ_HIGH;
 filter_order = FILTER_ORDER;
 taper_percentile = TAPER_PERCENTILE;
 hampel_win = HAMPEL_WIN;
-para_initial(0);
+para_initial('clear');
 
 for ii = 1: num_file
     dfname = strcat(data_dir, sta_file(ii));
@@ -38,7 +39,7 @@ for ii = 1: num_file
 %     if check_zero(S)
 %         nsta = nsta - 1;
 %         movefile(dfname, [discard_dir, S.FILENAME]);
-%         Snew(ii) = struct([]);
+%         keep(ii) = 0;
 %         continue
 %     end
 %     
@@ -78,4 +79,5 @@ for ii = 1: num_file
     Snew(ii) = S;
     Snew(ii).DATA1 = d;
 end
+Snew = Snew(keep == 1);
 end
