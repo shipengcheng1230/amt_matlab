@@ -46,7 +46,6 @@ while max_iter
         (trun_bool == 0) .* 1 + ...
         (trun_bool == 1) .* (1 / water_level - 1);
     data = data .* trun_bool;
-    plot(data)
 
     if num_above == 0
         break

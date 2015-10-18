@@ -30,53 +30,52 @@ for ii = 1: num_file
     dfname = strcat(data_dir, sta_file(ii));
     S = readsac(dfname);
     d = S.DATA1;
-    S.DATA1 = [];
-    d = hampel(detrend(d), floor(hampel_win / S.DELTA));
-    wintaper = tukeywin(S.NPTS, taper_percentile);
-    d = d .* wintaper;
-    
-    if check_zero(S)
-        nsta = nsta - 1;
-        movefile(dfname, [discard_dir, S.FILENAME]);
-        Snew(ii) = struct([]);
-        continue
-    end
-    
-    if freq_high >= 0.5 / S.DELTA
-        ME = MException(...
-            'arguSetting:exceedingNyquist', ...
-            'Corner freq. %f greater than Nyquist %f!', ...
-            freq_high, 0.5 / S.DELTA);
-        throw(ME)
-    end
-    
-    [b, a] = butter(filter_order, [freq_low, freq_high] .* S.DELTA .* 2);
-    d = filter(b, a, d);
-    numNaN = numel(find(isnan(d)));
-    if  numNaN > 0
-        ME = MException(...
-            'filterError:NaN', ...
-            'Filtered data contain %d NaN!\n', numNaN);
-        throw(ME)
-    end
-    
-    try
-        d = absmean_norm(d, S.DELTA);
-    catch ME
-        if (strcmp(ME.identifier, 'arguSetting:exceedingNyquist'))
-            msg = 'RESET ''freq_high_absm''';
-            causeException = ...
-                MException('arguSetting:exceedingNyquist', msg);
-            ME = addCause(ME, causeException);
-        end
-        rethrow(ME)
-    end
-    
-    d = spectral_norm(d, S.NPTS, S.DELTA);
-    d = d / max(abs(d));
+%     S.DATA1 = [];
+%     d = hampel(detrend(d), floor(hampel_win / S.DELTA));
+%     wintaper = tukeywin(S.NPTS, taper_percentile);
+%     d = d .* wintaper;
+%     
+%     if check_zero(S)
+%         nsta = nsta - 1;
+%         movefile(dfname, [discard_dir, S.FILENAME]);
+%         Snew(ii) = struct([]);
+%         continue
+%     end
+%     
+%     if freq_high >= 0.5 / S.DELTA
+%         ME = MException(...
+%             'arguSetting:exceedingNyquist', ...
+%             'Corner freq. %f greater than Nyquist %f!', ...
+%             freq_high, 0.5 / S.DELTA);
+%         throw(ME)
+%     end
+%     
+%     [b, a] = butter(filter_order, [freq_low, freq_high] .* S.DELTA .* 2);
+%     d = filter(b, a, d);
+%     numNaN = numel(find(isnan(d)));
+%     if  numNaN > 0
+%         ME = MException(...
+%             'filterError:NaN', ...
+%             'Filtered data contain %d NaN!\n', numNaN);
+%         throw(ME)
+%     end
+%     
+%     try
+%         d = absmean_norm(d, S.DELTA);
+%     catch ME
+%         if (strcmp(ME.identifier, 'arguSetting:exceedingNyquist'))
+%             msg = 'RESET ''freq_high_absm''';
+%             causeException = ...
+%                 MException('arguSetting:exceedingNyquist', msg);
+%             ME = addCause(ME, causeException);
+%         end
+%         rethrow(ME)
+%     end
+%     
+%     d = spectral_norm(d, S.NPTS, S.DELTA);
+%     d = d / max(abs(d));
     
     Snew(ii) = S;
     Snew(ii).DATA1 = d;
 end
-
 end
