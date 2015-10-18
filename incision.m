@@ -1,4 +1,4 @@
-function [ flag ] = incision( ...
+function [ num_seg ] = incision( ...
     S, prestack_dir, discard_dir, stanet_name, stalist_name, equip )
 %INCISION Summary of this function goes here
 %   Detailed explanation goes here
@@ -69,6 +69,7 @@ if isinf(seg_second)
         fprintf(stalistID, '%s\n', S(ii).FILENAME);
         writesac(S(ii));
     end
+    num_seg = 1;
 else
     num_seg = min(floor(S(:).NPTS .* S(:).DELTA ./ seg_second));
     for ii = 1: num_file
@@ -89,5 +90,4 @@ else
     end
 end
 fclose(stalistID);
-flag = 0;
 end

@@ -7,7 +7,7 @@ regexpr_sac = '\w*(SAC)\w*';
 regexpr_peripheral = '[\w-]*[0-9]+(m)';
 regexpr_dist = '[0-9]+m';
 regexpr_with_dash = '[\w-]*';
-precondtemp = 'precond.temp';
+precondtemp_name = 'precond.temp';
 stalist_name = 'stalist';
 
 for ii = 3: length(stanet)
@@ -33,19 +33,20 @@ for ii = 3: length(stanet)
         foldfind(char(equip_centre_dir), regexpr_sac, 'match');
     
     S_centre = precond(char(equip_centre_dir), discard_dir, component);
-    incision( ...
+    numseg = incision( ...
         S_centre, prestack_dir, discard_dir, stanet(ii).name, ...
         stalist, 'centre');
+    
+    precondtemp = strcat(prestacknet_dir, precondtemp_name);
+    tempID = fopen(precondtemp, 'w');
+    fprintf(tempID, '%d\n', numseg);
     
     [equip_peripheral_dir, equip_peripheral] = ...
         foldfind(equip_dir, comexpr_prepheral, 'match');
     
     num_peripheral = numel(equip_peripheral);
     radius = zeros(num_peripheral, 1);
-    
-    precondtemp_name = strcat(prestacknet_dir, precondtemp);
-    tempID = fopen(precondtemp_name, 'w');
-    fprintf(tempID, '%d\n', num_peripheral + 1);
+    num_sta = 1;
     
     for jj = 1: num_peripheral
         dist = regexp(equip_peripheral(jj), regexpr_dist, 'match');
@@ -56,7 +57,7 @@ for ii = 3: length(stanet)
             foldfind(equip_peripheral_dir{jj}, regexpr_with_dash, 'match');
         
         num_seq = numel(equip_seq_dir);
-        fprintf(tempID, '%d\n', num_seq);
+        num_sta = num_sta + num_seq;
         
         for kk = 1: num_seq
             [sac_fold, ~] = ...
@@ -68,7 +69,8 @@ for ii = 3: length(stanet)
                 stanet(ii).name, stalist, equip_seq(kk));
         end
     end
+    fprintf(tempID, '%d\n', num_sta);
     fclose(tempID);
 end
-
+status = 0;
 end
