@@ -41,7 +41,8 @@ for ii = 2: seginfo(end)
     sel_bool(bd + 1: bd + minseg) = 1;
 end
 
-pair(:,:) = stalistinfo(sel_bool == 1,:);
+pair(:, :) = stalistinfo(sel_bool == 1, :);
+
 num_pair = nchoosek(seginfo(end), 2);
 pairlistID = cellfun(@fopen, pairlist, repmat({'w'}, 1, num_stalist));
 
