@@ -7,7 +7,7 @@ regexpr_sac = '\w*(SAC)\w*';
 regexpr_peripheral = '[\w-]*[0-9]+(m)';
 regexpr_dist = '[0-9]+m';
 regexpr_with_dash = '[\w-]*';
-sta_seg = 'staseg';
+sta_seg_name = 'staseg';
 stalist_name = 'stalist';
 
 component = sort(lower(component));
@@ -47,9 +47,9 @@ for ii = 3: num_stanet
         S_centre, prestack_dir, discard_dir, stanet(ii).name, ...
         stafile, 'centre');
     
-    precondtemp = strcat(prestacknet_dir, sta_seg);
-    tempID = fopen(precondtemp, 'w');
-    fprintf(tempID, '%d\n', numseg);
+    staseg = strcat(prestacknet_dir, sta_seg_name);
+    stasegID = fopen(staseg, 'w');
+    fprintf(stasegID, '%d\n', numseg);
     
     [equip_peripheral_dir, equip_peripheral] = ...
         foldfind(equip_dir, comexpr_prepheral, 'match');
@@ -74,13 +74,16 @@ for ii = 3: num_stanet
                 foldfind(equip_seq_dir{kk}, regexpr_sac, 'match', false);
             S_peripheral = ...
                 precond(char(sac_fold), component);
-            incision( ...
+            numseg = incision( ...
                 S_peripheral, prestack_dir, discard_dir, ...
                 stanet(ii).name, stafile, equip_seq(kk));
+            fprintf(stasegID, '%d\n', numseg);
         end
     end
-    fprintf(tempID, '%d\n', num_sta);
-    fclose(tempID);
+    fprintf(stasegID, '%d\n', num_sta);
+    fclose(stasegID);
 end
+
+xcorrpairlist(stafile, staseg, component);
 status = 0;
 end
