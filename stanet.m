@@ -7,10 +7,13 @@ regexpr_sac = '\w*(SAC)\w*';
 regexpr_peripheral = '[\w-]*[0-9]+(m)';
 regexpr_dist = '[0-9]+m';
 regexpr_with_dash = '[\w-]*';
-precondtemp_name = 'precond.temp';
+sta_seg = 'staseg';
 stalist_name = 'stalist';
 
+component = sort(lower(component));
 num_stanet = length(stanet);
+num_component = numel(component);
+
 for ii = 3: num_stanet
     if stanet(ii).isdir == 0
         continue
@@ -21,9 +24,15 @@ for ii = 3: num_stanet
         mkdir(prestacknet_dir);
     end
     
-    stalist = fullfile(prestack_dir, stanet(ii).name, stalist_name);
-    stalistID = fopen(stalist, 'w');
-    fclose(stalistID);
+    stafile = cellfun(...
+        @strcat, ...
+        repmat({stalist_name}, 1, num_component), ...
+        repmat({'_'}, 1, num_component), ...
+        num2cell(lower(component)), ...
+        'UniformOutput', false);
+    stafile = fullfile(prestack_dir, stanet(ii).name, stafile);
+    stalistID = cellfun(@fopen, stafile, repmat({'w'}, 1, num_component));
+    arrayfun(@fclose, stalistID);
     
     equip_dir = fullfile(net_dir, stanet(ii).name, filesep);
     comexpr_prepheral = [stanet(ii).name, regexpr_peripheral];
@@ -33,12 +42,12 @@ for ii = 3: num_stanet
     [equip_centre_dir, ~] = ...
         foldfind(char(equip_centre_dir), regexpr_sac, 'match', false);
     
-    S_centre = precond(char(equip_centre_dir), discard_dir, component);
+    S_centre = precond(char(equip_centre_dir), component);
     numseg = incision( ...
         S_centre, prestack_dir, discard_dir, stanet(ii).name, ...
-        stalist, 'centre');
+        stafile, 'centre');
     
-    precondtemp = strcat(prestacknet_dir, precondtemp_name);
+    precondtemp = strcat(prestacknet_dir, sta_seg);
     tempID = fopen(precondtemp, 'w');
     fprintf(tempID, '%d\n', numseg);
     
@@ -64,10 +73,10 @@ for ii = 3: num_stanet
             [sac_fold, ~] = ...
                 foldfind(equip_seq_dir{kk}, regexpr_sac, 'match', false);
             S_peripheral = ...
-                precond(char(sac_fold), discard_dir, component);
+                precond(char(sac_fold), component);
             incision( ...
                 S_peripheral, prestack_dir, discard_dir, ...
-                stanet(ii).name, stalist, equip_seq(kk));
+                stanet(ii).name, stafile, equip_seq(kk));
         end
     end
     fprintf(tempID, '%d\n', num_sta);

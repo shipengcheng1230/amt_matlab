@@ -28,7 +28,7 @@ if exist(prestacknet_dir, 'dir') ~= 7
 end
 
 
-if strcmp(equip, 'centre') == 1
+if strcmp(equip, 'centre')
     prestacknet_dir = fullfile(prestacknet_dir, 'centre', filesep);
     if exist(prestacknet_dir, 'dir') ~= 7
         mkdir(prestacknet_dir)
@@ -44,7 +44,7 @@ end
 
 oldfile = dir(prestacknet_dir);
 num_oldfile = numel(oldfile) - 2;
-if num_oldfile > 0
+if num_oldfile
     trash_dir = fullfile(discard_dir, char(date), filesep);
     if exist(trash_dir, 'dir') ~= 7
         mkdir(trash_dir)
@@ -56,8 +56,10 @@ if num_oldfile > 0
     cellfun(@movefile, oldfile, trash_dir);
 end
 
-stalistID = fopen(stalist_name, 'a');
-if isinf(seg_second)
+stalistID = cellfun(@fopen, stalist_name, repmat({'a'}, 1, num_file));
+if isinf(seg_second)        
+    num_seg = 1;
+    
     writename = ...
         cellfun( ...
         @fullfile, ...
@@ -65,13 +67,15 @@ if isinf(seg_second)
         {S(:).FILENAME}, ...
         'UniformOutput', false);
     [S.FILENAME] = writename{:};
-    for ii = 1: num_file
-        fprintf(stalistID, '%s\n', S(ii).FILENAME);
-        writesac(S(ii));
-    end
-    num_seg = 1;
+    
+    cellfun(@fprintf, ...
+        num2cell(stalistID), ...
+        repmat({'%s\n'}, 1, num_file), ...
+        {S.FILENAME}, ...
+        'UniformOutput', false);
+    arrayfun(@writesac, S, 'UniformOutput', false);
 else
-    num_seg = min(floor(S(:).NPTS .* S(:).DELTA ./ seg_second));
+    num_seg = min(floor([S(:).NPTS] .* [S(:).DELTA] ./ seg_second));
     for ii = 1: num_file
         Snew = S(ii);
         Snew.DATA1 = [];
@@ -84,10 +88,10 @@ else
                 S(ii).DATA1((jj - 1) * Snew.NPTS + 1: jj * Snew.NPTS);
             Snew.FILENAME = [name, '_', num2str(jj), '_', ext];
             Snew.FILENAME = fullfile(prestacknet_dir, Snew.FILENAME);
-            fprintf(stalistID, '%s\n', Snew.FILENAME);
+            fprintf(stalistID(ii), '%s\n', Snew.FILENAME);
             writesac(Snew);
         end
     end
 end
-fclose(stalistID);
+arrayfun(@fclose, stalistID);
 end

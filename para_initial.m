@@ -19,7 +19,7 @@ winlen_absm = floor(0.5 / freq_low);
 winlen_absm = winlen_absm - (mod(winlen_absm, 2) == 0);
 max_iter = 15;
 
-seg_seconds = Inf;
+seg_seconds = 1200;
 
 xcorr_winlen = 1800;
 xcorr_overlap = 0.75;

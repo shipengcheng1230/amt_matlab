@@ -5,10 +5,6 @@ function [ flag ] = check_zero( S )
 evl = 1e-9;
 eper = 0.15;
 
-rej_bool = bsxfun(@lt, abs(S.DATA1), evl);
-num_zero = sum(rej_bool);
-
-flag = (num_zero > (S.NPTS * eper));
-
+flag = (sum(abs(S.DATA1) < evl) > (S.NPTS * eper));
 end
 

@@ -1,5 +1,4 @@
-function [ Snew ] = precond( ...
-    data_dir, discard_dir, component )
+function [ Snew ] = precond( data_dir, component )
 %PRECOND Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -11,7 +10,6 @@ comexpr = ['[\w.]*_[', component, '][\w.]*'];
 sta_file = regexp(sta_file, comexpr, 'match');
 num_file = length(sta_file);
 Snew = sacstruct(num_file);
-keep = ones(num_file, 1);
 
 para_initial('precond');
 global FREQ_LOW
@@ -28,20 +26,18 @@ hampel_win = HAMPEL_WIN;
 para_initial('clear');
 
 for ii = 1: num_file
-    dfname = strcat(data_dir, sta_file(ii));
+    dfname = fullfile(data_dir, sta_file(ii));
     S = readsac(dfname);
+    
+    if check_zero(S)
+        continue
+    end
+    
     d = S.DATA1;
 %     S.DATA1 = [];
 %     d = hampel(detrend(d), floor(hampel_win / S.DELTA));
 %     wintaper = tukeywin(S.NPTS, taper_percentile);
-%     d = d .* wintaper;
-%     
-%     if check_zero(S)
-%         nsta = nsta - 1;
-%         movefile(dfname, [discard_dir, S.FILENAME]);
-%         keep(ii) = 0;
-%         continue
-%     end
+%     d = d .* wintaper;    
 %     
 %     if freq_high >= 0.5 / S.DELTA
 %         ME = MException(...
@@ -79,5 +75,4 @@ for ii = 1: num_file
     Snew(ii) = S;
     Snew(ii).DATA1 = d;
 end
-Snew = Snew(keep == 1);
 end
