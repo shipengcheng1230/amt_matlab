@@ -1,5 +1,5 @@
 function [ status ] = stanet( ...
-    net_dir, prestack_dir, discard_dir, component )
+    net_dir, singledata_dir, discard_dir, component )
 %STANET Summary of this function goes here
 %   Detailed explanation goes here
 stanet= dir(net_dir);
@@ -15,11 +15,11 @@ num_stanet = length(stanet);
 num_component = numel(component);
 
 for ii = 3: num_stanet
-    if stanet(ii).isdir == 0
+    if ~stanet(ii).isdir
         continue
     end
     
-    prestacknet_dir = fullfile(prestack_dir, stanet(ii).name, filesep);
+    prestacknet_dir = fullfile(singledata_dir, stanet(ii).name, filesep);
     if exist(prestacknet_dir, 'dir') ~= 7
         mkdir(prestacknet_dir);
     end
@@ -30,7 +30,7 @@ for ii = 3: num_stanet
         repmat({'_'}, 1, num_component), ...
         num2cell(component), ...
         'UniformOutput', false);
-    stafile = fullfile(prestack_dir, stanet(ii).name, stafile);
+    stafile = fullfile(singledata_dir, stanet(ii).name, stafile);
     stalistID = cellfun(@fopen, stafile, repmat({'w'}, 1, num_component));
     arrayfun(@fclose, stalistID);
     
@@ -44,7 +44,7 @@ for ii = 3: num_stanet
     
     S_centre = precond(char(equip_centre_dir), component);
     numseg = incision( ...
-        S_centre, prestack_dir, discard_dir, stanet(ii).name, ...
+        S_centre, singledata_dir, discard_dir, stanet(ii).name, ...
         stafile, 'centre');
     
     staseg = strcat(prestacknet_dir, sta_seg_name);
@@ -75,7 +75,7 @@ for ii = 3: num_stanet
             S_peripheral = ...
                 precond(char(sac_fold), component);
             numseg = incision( ...
-                S_peripheral, prestack_dir, discard_dir, ...
+                S_peripheral, singledata_dir, discard_dir, ...
                 stanet(ii).name, stafile, equip_seq(kk));
             fprintf(stasegID, '%d\n', numseg);
         end

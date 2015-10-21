@@ -1,5 +1,5 @@
 function [ num_seg ] = incision( ...
-    S, prestack_dir, discard_dir, stanet_name, stalist_name, equip )
+    S, singledata_dir, discard_dir, stanet_name, stalist_name, equip )
 %INCISION Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -22,7 +22,7 @@ para_initial('clear');
 
 num_file = numel(S);
 
-prestacknet_dir = fullfile(prestack_dir, stanet_name, filesep);
+prestacknet_dir = fullfile(singledata_dir, stanet_name, filesep);
 if exist(prestacknet_dir, 'dir') ~= 7
     mkdir(prestacknet_dir)
 end
