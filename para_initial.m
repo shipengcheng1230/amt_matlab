@@ -25,6 +25,8 @@ xcorr_winlen = 1800;
 xcorr_overlap = 0.75;
 xcorr_wintype = 'hann';
 
+bandwidth = 0.001;
+
 try
     switch step
         case 'clear'
@@ -57,6 +59,9 @@ try
             eval(setGlobalstr('XCORR_OVERLAP', xcorr_overlap));
             eval(setGlobalstr('XCORR_WINTYPE', xcorr_wintype));
             status = 0;
+        case 'spacxcorr'
+            eval(setGlobalstr('FILTER_ORDER', filter_order));            
+            eval(setGlobalstr('BANDWIDTH', bandwidth));
         otherwise
             status = 1;
     end
