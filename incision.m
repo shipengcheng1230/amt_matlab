@@ -58,8 +58,7 @@ end
 
 stalistID = cellfun(@fopen, stalist_name, repmat({'a'}, 1, num_file));
 if isinf(seg_second)        
-    num_seg = 1;
-    
+    num_seg = 1;    
     writename = ...
         cellfun( ...
         @fullfile, ...

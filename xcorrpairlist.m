@@ -1,4 +1,4 @@
-function [ flag ] = xcorrpairlist( stalist, staseg, component )
+function [ minseg ] = xcorrpairlist( stalist, staseg, component )
 %XCORRPAIRLIST Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -47,14 +47,14 @@ num_pair = nchoosek(seginfo(end), 2);
 pairlistID = cellfun(@fopen, pairlist, repmat({'w'}, 1, num_stalist));
 
 for ii = 1: num_stalist
-    pairname = nchoosek(pair(1: minseg: end, ii), 2);
-    cellfun(...
-        @fprintf, ...
-        num2cell(ones(num_pair, 1) * pairlistID(ii)), ...
-        repmat({'%s %s\n'}, num_pair, 1), ...
-        pairname(:, 1), pairname(:, 2));
+    for jj = 1: minseg
+        pairname = nchoosek(pair(jj: minseg: end, ii), 2);
+        cellfun(...
+            @fprintf, ...
+            num2cell(ones(num_pair, 1) * pairlistID(ii)), ...
+            repmat({'%s %s\n'}, num_pair, 1), ...
+            pairname(:, 1), pairname(:, 2));
+    end
 end
-
 arrayfun(@fclose, pairlistID);
-flag = 0;
 end
